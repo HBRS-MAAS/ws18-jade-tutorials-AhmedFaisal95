@@ -7,14 +7,17 @@ import maas.tutorials.BookBuyerAgent;
 import maas.BookSellerAgent;;
 
 public class Start {
+	public static List<String> paperBackTitles;
+	public static List<String> eBookTitles;
+	
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
     	//agents.add("tester:maas.tutorials.BookBuyerAgent");
     	
     	int numBuyerAgents = 20;
     	int numSellerAgents = 3;
-    	List<String> paperBackTitles = createPaperBackTitles();
-    	List<String> eBookTitles = createEBookTitles();
+    	paperBackTitles = createPaperBackTitles();
+    	eBookTitles = createEBookTitles();
     	int numPaperBackTitles = paperBackTitles.size();
     	int numEBookTitles = eBookTitles.size();
     	int bookIndex = 0;
