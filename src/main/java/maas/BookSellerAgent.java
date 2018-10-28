@@ -11,6 +11,7 @@ import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
 import java.util.*;
 
+@SuppressWarnings("serial")
 public class BookSellerAgent extends Agent {
 	// The catalogue of books for sale (maps the title of a book to its price)
 	private Hashtable catalogue;
@@ -20,6 +21,27 @@ public class BookSellerAgent extends Agent {
 		
 		// Create the catalogue
 		catalogue = new Hashtable<String, Double>();
+		
+		int numPaperBackTitles = Start.paperBackTitles.size();
+    	int numEBookTitles = Start.eBookTitles.size();
+    	int bookIndex = 0;
+		
+		for (int i = 1 ; i <= 4 ; i++) {
+    		if ((Math.round(Math.random())) < 0.45) {
+    			bookIndex = (int)((Math.random() * numPaperBackTitles));
+    			catalogue.put(Start.paperBackTitles.toArray()[bookIndex], Math.random()*20);
+    		}
+    		else {
+    			bookIndex = (int)((Math.random() * numEBookTitles));
+    			catalogue.put(Start.eBookTitles.toArray()[bookIndex], Math.random()*20);
+    		}
+    	}
+		
+		System.out.println("["+getAID().getLocalName()+"]: Available Titles: ");
+		for (Object s : catalogue.keySet()) {
+			System.out.println("Book Title: "+(String)s+". Price: "+catalogue.get(s));
+		}
+		System.out.println("-----------------------");
 
 	try {
 		Thread.sleep(3000);
