@@ -13,9 +13,21 @@ import jade.lang.acl.ACLMessage;
 
 @SuppressWarnings("serial")
 public class BookBuyerAgent extends Agent {
+	private String targetBookTitle;
+	
 	protected void setup() {
 	// Printout a welcome message
 		System.out.println("Hello! Buyer-agent "+getAID().getName()+" is ready.");
+		
+		Object[] args = getArguments();
+		if (args != null && args.length > 0) {
+			targetBookTitle = (String) args[0];
+			System.out.println("["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle);
+		}
+		else {
+		System.out.println("No book title specified for agent ["+getAID().getLocalName()+"]");
+		doDelete();
+		}
 
         try {
  			Thread.sleep(3000);
