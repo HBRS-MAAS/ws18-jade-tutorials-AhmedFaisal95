@@ -101,6 +101,9 @@ public class BookSellerAgent extends Agent {
 				}
 				myAgent.send(reply);
 			}
+			else {
+				block();
+			}
 		}
 	} 
 	
