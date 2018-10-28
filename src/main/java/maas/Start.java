@@ -4,20 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import maas.tutorials.BookBuyerAgent;
+import maas.BookSellerAgent;;
 
 public class Start {
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
     	//agents.add("tester:maas.tutorials.BookBuyerAgent");
     	
-    	int numAgents = 20;
+    	int numBuyerAgents = 20;
+    	int numSellerAgents = 3;
     	List<String> paperBackTitles = createPaperBackTitles();
     	List<String> eBookTitles = createEBookTitles();
     	int numPaperBackTitles = paperBackTitles.size();
     	int numEBookTitles = eBookTitles.size();
     	int bookIndex = 0;
     	
-    	for (int i = 1 ; i <= numAgents ; i++) {
+    	for (int i = 1 ; i <= numBuyerAgents ; i++) {
     		if ((Math.round(Math.random())) < 0.45) {
     			bookIndex = (int)((Math.random() * numPaperBackTitles));
     			agents.add("Buyer"+i+":maas.tutorials.BookBuyerAgent("+paperBackTitles.toArray()[bookIndex]+")");
@@ -26,6 +28,10 @@ public class Start {
     			bookIndex = (int)((Math.random() * numEBookTitles));
     			agents.add("Buyer"+i+":maas.tutorials.BookBuyerAgent("+eBookTitles.toArray()[bookIndex]+")");
     		}
+    	}
+    	
+    	for (int i = 1 ; i <= numSellerAgents ; i++) {
+    		agents.add("Seller"+i+":maas.BookSellerAgent");
     	}
 
     	List<String> cmd = new Vector<>();
