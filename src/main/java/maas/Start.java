@@ -13,9 +13,19 @@ public class Start {
     	int numAgents = 20;
     	List<String> paperBackTitles = createPaperBackTitles();
     	List<String> eBookTitles = createEBookTitles();
+    	int numPaperBackTitles = paperBackTitles.size();
+    	int numEBookTitles = eBookTitles.size();
+    	int bookIndex = 0;
     	
     	for (int i = 1 ; i <= numAgents ; i++) {
-    		agents.add("Buyer"+i+":maas.tutorials.BookBuyerAgent");
+    		if ((Math.round(Math.random())) < 0.45) {
+    			bookIndex = (int)((Math.random() * numPaperBackTitles));
+    			agents.add("Buyer"+i+":maas.tutorials.BookBuyerAgent("+paperBackTitles.toArray()[bookIndex]+")");
+    		}
+    		else {
+    			bookIndex = (int)((Math.random() * numEBookTitles));
+    			agents.add("Buyer"+i+":maas.tutorials.BookBuyerAgent("+eBookTitles.toArray()[bookIndex]+")");
+    		}
     	}
 
     	List<String> cmd = new Vector<>();
