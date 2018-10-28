@@ -4,11 +4,14 @@ import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.FIPANames;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -18,39 +21,43 @@ public class BookSellerAgent extends Agent {
 
 	protected void setup() {
 		System.out.println("Hello! Seller-agent "+getAID().getName()+" is ready.");
-		
+
 		// Create the catalogue
 		catalogue = new Hashtable<String, Double>();
-		
+
 		int numPaperBackTitles = Start.paperBackTitles.size();
-    	int numEBookTitles = Start.eBookTitles.size();
-    	int bookIndex = 0;
-		
+		int numEBookTitles = Start.eBookTitles.size();
+		int bookIndex = 0;
+
 		for (int i = 1 ; i <= 4 ; i++) {
-    		if ((Math.round(Math.random())) < 0.45) {
-    			bookIndex = (int)((Math.random() * numPaperBackTitles));
-    			catalogue.put(Start.paperBackTitles.toArray()[bookIndex], Math.random()*20);
-    		}
-    		else {
-    			bookIndex = (int)((Math.random() * numEBookTitles));
-    			catalogue.put(Start.eBookTitles.toArray()[bookIndex], Math.random()*20);
-    		}
-    	}
-		
+			if ((Math.round(Math.random())) < 0.45) {
+				bookIndex = (int)((Math.random() * numPaperBackTitles));
+				catalogue.put(Start.paperBackTitles.toArray()[bookIndex], Math.random()*20);
+			}
+			else {
+				bookIndex = (int)((Math.random() * numEBookTitles));
+				catalogue.put(Start.eBookTitles.toArray()[bookIndex], Math.random()*20);
+			}
+		}
+
 		System.out.println("["+getAID().getLocalName()+"]: Available Titles: ");
 		for (Object s : catalogue.keySet()) {
 			System.out.println("Book Title: "+(String)s+". Price: "+catalogue.get(s));
 		}
 		System.out.println("-----------------------");
 
-	try {
-		Thread.sleep(3000);
-	} catch (InterruptedException e) {
-		//e.printStackTrace();
-	}
-	
-	addBehaviour(new shutdown());
-	
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			//e.printStackTrace();
+		}
+		
+		addBehaviour(new OfferRequestsServer());
+		
+		addBehaviour(new PurchaseOrdersServer());
+
+		addBehaviour(new shutdown());
+
 	}
 
 	// Taken from http://www.rickyvanrijn.nl/2017/08/29/how-to-shutdown-jade-agent-platform-programmatically/
@@ -73,5 +80,55 @@ public class BookSellerAgent extends Agent {
 
 		}
 	}
+
+	private class OfferRequestsServer extends CyclicBehaviour {
+		public void action() {
+			ACLMessage msg = myAgent.receive();
+			if (msg != null) {
+				// Message received. Process it
+				String title = msg.getContent();
+				ACLMessage reply = msg.createReply();
+				Integer price = (Integer) catalogue.get(title);
+				if (price != null) {
+					// The requested book is available for sale. Reply with the price
+					reply.setPerformative(ACLMessage.PROPOSE);
+					reply.setContent(String.valueOf(price.intValue()));
+				}
+				else {
+					// The requested book is NOT available for sale.
+					reply.setPerformative(ACLMessage.REFUSE);
+					reply.setContent("not-available");
+				}
+				myAgent.send(reply);
+			}
+		}
+	} 
+	
+	private class PurchaseOrdersServer extends CyclicBehaviour {
+		public void action() {
+			MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+			ACLMessage msg = myAgent.receive(mt);
+			if (msg != null) {
+				// ACCEPT_PROPOSAL Message received. Process it
+				String title = msg.getContent();
+				ACLMessage reply = msg.createReply();
+
+				Integer price = (Integer) catalogue.remove(title);
+				if (price != null) {
+					reply.setPerformative(ACLMessage.INFORM);
+					System.out.println(title+" sold to agent "+msg.getSender().getName());
+				}
+				else {
+					// The requested book has been sold to another buyer in the meanwhile .
+					reply.setPerformative(ACLMessage.FAILURE);
+					reply.setContent("not-available");
+				}
+				myAgent.send(reply);
+			}
+			else {
+				block();
+			}
+		}
+	}  
 
 }
