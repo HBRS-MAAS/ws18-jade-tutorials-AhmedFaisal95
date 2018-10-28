@@ -29,7 +29,7 @@ public class BookBuyerAgent extends Agent {
 			System.out.println("["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle);
 
 			// Add a TickerBehaviour that schedules a request to seller agents every minute
-			addBehaviour(new TickerBehaviour(this, 60000) {
+			addBehaviour(new TickerBehaviour(this, 10000) {
 				protected void onTick() {
 					myAgent.addBehaviour(new RequestPerformer());
 				}
@@ -45,7 +45,7 @@ public class BookBuyerAgent extends Agent {
 		} catch (InterruptedException e) {
 			//e.printStackTrace();
 		}
-		addBehaviour(new shutdown());
+//		addBehaviour(new shutdown());
 
 	}
 	protected void takeDown() {
@@ -140,8 +140,9 @@ public class BookBuyerAgent extends Agent {
 					// Purchase order reply received
 					if (reply.getPerformative() == ACLMessage.INFORM) {
 						// Purchase successful. We can terminate
-						System.out.println(targetBookTitle+" successfully purchased.");
+						System.out.println("["+getAID().getLocalName()+"]"+targetBookTitle+" successfully purchased.");
 						System.out.println("Price = "+bestPrice);
+						System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 						myAgent.doDelete();
 					}
 					step = 4;
