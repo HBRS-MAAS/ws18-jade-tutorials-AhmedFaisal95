@@ -32,11 +32,11 @@ public class BookSellerAgent extends Agent {
 		for (int i = 1 ; i <= 4 ; i++) {
 			if ((Math.round(Math.random())) < 0.45) {
 				bookIndex = (int)((Math.random() * numPaperBackTitles));
-				catalogue.put(Start.paperBackTitles.toArray()[bookIndex], Math.random()*20);
+				catalogue.put(Start.paperBackTitles.toArray()[bookIndex], (int) (Math.random()*20));
 			}
 			else {
 				bookIndex = (int)((Math.random() * numEBookTitles));
-				catalogue.put(Start.eBookTitles.toArray()[bookIndex], Math.random()*20);
+				catalogue.put(Start.eBookTitles.toArray()[bookIndex], (int) (Math.random()*20));
 			}
 		}
 
@@ -56,7 +56,7 @@ public class BookSellerAgent extends Agent {
 		
 		addBehaviour(new PurchaseOrdersServer());
 
-		addBehaviour(new shutdown());
+//		addBehaviour(new shutdown());
 
 	}
 
