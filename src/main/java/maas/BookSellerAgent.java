@@ -9,11 +9,17 @@ import jade.domain.FIPANames;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
+import java.util.*;
 
 public class BookSellerAgent extends Agent {
+	// The catalogue of books for sale (maps the title of a book to its price)
+	private Hashtable catalogue;
 
 	protected void setup() {
 		System.out.println("Hello! Seller-agent "+getAID().getName()+" is ready.");
+		
+		// Create the catalogue
+		catalogue = new Hashtable<String, Double>();
 
 	try {
 		Thread.sleep(3000);
