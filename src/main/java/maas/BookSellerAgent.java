@@ -112,8 +112,16 @@ public class BookSellerAgent extends Agent {
 				// ACCEPT_PROPOSAL Message received. Process it
 				String title = msg.getContent();
 				ACLMessage reply = msg.createReply();
-
-				Integer price = (Integer) catalogue.remove(title);
+				Integer price = new Integer(0);
+				
+				if (title.contains("eBook")) {
+					price = (Integer) catalogue.get(title);
+				}
+				else {
+					price = (Integer) catalogue.remove(title);
+					System.out.println("["+getAID().getLocalName()+"]: "+title+" (paperback) removed from catalogue.");
+				}
+				
 				if (price != null) {
 					reply.setPerformative(ACLMessage.INFORM);
 					System.out.println("["+getAID().getLocalName()+"]: "+title+" sold to agent "+msg.getSender().getName());
