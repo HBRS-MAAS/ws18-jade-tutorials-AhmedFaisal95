@@ -3,6 +3,7 @@ package maas.tutorials;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.basic.Action;
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.domain.FIPANames;
@@ -14,6 +15,8 @@ import jade.lang.acl.ACLMessage;
 @SuppressWarnings("serial")
 public class BookBuyerAgent extends Agent {
 	private String targetBookTitle;
+	
+	private AID[] sellerAgents = {new AID("Seller1", AID.ISLOCALNAME), new AID("Seller2", AID.ISLOCALNAME), new AID("Seller3", AID.ISLOCALNAME)};
 	
 	protected void setup() {
 	// Printout a welcome message
@@ -61,4 +64,5 @@ public class BookBuyerAgent extends Agent {
 
 		}
 	}
+	
 }
