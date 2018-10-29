@@ -31,7 +31,7 @@ public class BookBuyerAgent extends Agent {
 			System.out.println("["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle);
 
 			// Add a TickerBehaviour that schedules a request to seller agents every minute
-			addBehaviour(new TickerBehaviour(this, 10000) {
+			addBehaviour(new TickerBehaviour(this, 1000) {
 				protected void onTick() {
 					myAgent.addBehaviour(new RequestPerformer());
 				}
@@ -51,7 +51,7 @@ public class BookBuyerAgent extends Agent {
 
 	}
 	protected void takeDown() {
-		System.out.println(getAID().getLocalName() + ": Terminating.");
+		System.out.println("\n^^^ "+getAID().getLocalName() + ": Terminating.\n"); 
 	}
 
 	// Taken from http://www.rickyvanrijn.nl/2017/08/29/how-to-shutdown-jade-agent-platform-programmatically/
