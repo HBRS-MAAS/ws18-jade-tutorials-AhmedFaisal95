@@ -6,6 +6,7 @@ import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.FIPANames;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
@@ -106,6 +107,12 @@ public class BookSellerAgent extends Agent {
 				myAgent.send(reply);
 			}
 			else {
+				myAgent.addBehaviour(new WakerBehaviour(myAgent, 60000) {
+					protected void handleElapsedTimeout() {
+						System.out.println("["+getAID().getLocalName()+"]: No more purchase requests. Closing down.");
+						addBehaviour(new shutdown());
+					}
+				} );
 				block();
 			}
 		}
