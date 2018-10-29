@@ -39,11 +39,16 @@ public class BookSellerAgent extends Agent {
 			restock();
 		}
 
-		System.out.println("["+getAID().getLocalName()+"]: Available Titles: ");
+		StringBuilder sb = new StringBuilder(); 
+		
+		sb.append("\n-----------------------\n");
+		sb.append("["+getAID().getLocalName()+"]: Available Titles: \n");
 		for (Object s : catalogue.keySet()) {
-			System.out.println("Book Title: "+(String)s+". Price: "+catalogue.get(s));
+			sb.append("Book Title: "+(String)s+". Price: "+catalogue.get(s)+"\n"); 
 		}
-		System.out.println("-----------------------");
+		sb.append("-----------------------\n"); 
+		
+		System.out.println(sb.toString());
 
 		try {
 			Thread.sleep(3000);
