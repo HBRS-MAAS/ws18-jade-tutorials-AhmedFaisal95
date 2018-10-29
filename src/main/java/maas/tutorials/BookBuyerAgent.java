@@ -121,6 +121,12 @@ public class BookBuyerAgent extends Agent {
 					}
 				}
 				else {
+					myAgent.addBehaviour(new WakerBehaviour(myAgent, 60000) {
+						protected void handleElapsedTimeout() {
+							System.out.println("["+getAID().getLocalName()+"]: Book not available with any seller. Waited too long.");
+							myAgent.doDelete(); 
+						}
+					} );
 					block();
 				}
 				break;
@@ -144,14 +150,15 @@ public class BookBuyerAgent extends Agent {
 					// Purchase order reply received
 					if (reply.getPerformative() == ACLMessage.INFORM) {
 						// Purchase successful. We can terminate
-						System.out.println("["+getAID().getLocalName()+"]"+targetBookTitle+" successfully purchased.");
+						System.out.println("["+getAID().getLocalName()+"]: "+targetBookTitle+" successfully purchased.");
 						System.out.println("Price = "+bestPrice);
 						System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
 
 						numBooksBought++; 
 
-						if (numBooksBought == 3) { 
+						if (numBooksBought == 3) {
+							System.out.println("["+getAID().getLocalName()+"]: All books purchased successfully.");
 							myAgent.doDelete(); 
 							//			              step = 4; 
 						} 
