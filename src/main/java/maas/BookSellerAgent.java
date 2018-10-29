@@ -18,6 +18,12 @@ import java.util.*;
 public class BookSellerAgent extends Agent {
 	// The catalogue of books for sale (maps the title of a book to its price)
 	private Hashtable catalogue;
+	
+	private List<String> myPaperBackTitles= new Vector<String> (Start.paperBackTitles); 
+	private List<String> myEBookTitles= new Vector<String> (Start.eBookTitles); 
+	   
+	private int numMyPaperBackTitles = myPaperBackTitles.size(); 
+	private int numMyEBookTitles = myEBookTitles.size();
 
 	protected void setup() {
 		System.out.println("Hello! Seller-agent "+getAID().getName()+" is ready.");
@@ -25,18 +31,18 @@ public class BookSellerAgent extends Agent {
 		// Create the catalogue
 		catalogue = new Hashtable<String, Double>();
 
-		int numPaperBackTitles = Start.paperBackTitles.size();
-		int numEBookTitles = Start.eBookTitles.size();
+		numMyPaperBackTitles = Start.paperBackTitles.size();
+		numMyEBookTitles = Start.eBookTitles.size();
 		int bookIndex = 0;
 
 		for (int i = 1 ; i <= 4 ; i++) {
 			if ((Math.round(Math.random())) < 0.45) {
-				bookIndex = (int)((Math.random() * numPaperBackTitles));
-				catalogue.put(Start.paperBackTitles.toArray()[bookIndex], (int) (Math.random()*20));
+				bookIndex = (int)((Math.random() * numMyPaperBackTitles));
+				catalogue.put(myPaperBackTitles.toArray()[bookIndex], (int) (Math.random()*20));
 			}
 			else {
-				bookIndex = (int)((Math.random() * numEBookTitles));
-				catalogue.put(Start.eBookTitles.toArray()[bookIndex], (int) (Math.random()*20));
+				bookIndex = (int)((Math.random() * numMyEBookTitles));
+				catalogue.put(myEBookTitles.toArray()[bookIndex], (int) (Math.random()*20));
 			}
 		}
 
