@@ -36,14 +36,7 @@ public class BookSellerAgent extends Agent {
 		int bookIndex = 0;
 
 		for (int i = 1 ; i <= 4 ; i++) {
-			if ((Math.round(Math.random())) < 0.45) {
-				bookIndex = (int)((Math.random() * numMyPaperBackTitles));
-				catalogue.put(myPaperBackTitles.toArray()[bookIndex], (int) (Math.random()*20));
-			}
-			else {
-				bookIndex = (int)((Math.random() * numMyEBookTitles));
-				catalogue.put(myEBookTitles.toArray()[bookIndex], (int) (Math.random()*20));
-			}
+			restock();
 		}
 
 		System.out.println("["+getAID().getLocalName()+"]: Available Titles: ");
@@ -146,6 +139,24 @@ public class BookSellerAgent extends Agent {
 				block();
 			}
 		}
-	}  
+	}
+	
+	 public void restock () { 
+		    int bookIndex = 0;
+		    String newBook = new String(); 
+		     
+		    if ((Math.round(Math.random())) < 0.45) { 
+		      bookIndex = (int)((Math.random() * numMyPaperBackTitles)); 
+		      newBook = myPaperBackTitles.toArray()[bookIndex].toString(); 
+		      catalogue.put(newBook, (int) (Math.random()*20)); 
+		    } 
+		    else { 
+		      bookIndex = (int)((Math.random() * numMyEBookTitles)); 
+		      newBook = myEBookTitles.toArray()[bookIndex].toString(); 
+		      catalogue.put(newBook, (int) (Math.random()*20)); 
+		    } 
+		     
+		    System.out.println("\n+++ ["+getAID().getLocalName()+"]: "+newBook+" now in stock.\n"); 
+		  } 
 
 }
