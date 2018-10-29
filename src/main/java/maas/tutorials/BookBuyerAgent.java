@@ -11,11 +11,13 @@ import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import maas.Start;
 
 
 @SuppressWarnings("serial")
 public class BookBuyerAgent extends Agent {
 	private String targetBookTitle;
+	private int numBooksBought = 0; 
 
 	private AID[] sellerAgents = {new AID("Seller1", AID.ISLOCALNAME), new AID("Seller2", AID.ISLOCALNAME), new AID("Seller3", AID.ISLOCALNAME)};
 
@@ -79,6 +81,8 @@ public class BookBuyerAgent extends Agent {
 		private int repliesCnt = 0; // The counter of replies from seller agents
 		private MessageTemplate mt; // The template to receive replies
 		private int step = 0;
+		private int bookIndex = 0; 
+
 		public void action() {
 			switch (step) {
 			case 0:
@@ -143,7 +147,27 @@ public class BookBuyerAgent extends Agent {
 						System.out.println("["+getAID().getLocalName()+"]"+targetBookTitle+" successfully purchased.");
 						System.out.println("Price = "+bestPrice);
 						System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-						myAgent.doDelete();
+
+
+						numBooksBought++; 
+
+						if (numBooksBought == 3) { 
+							myAgent.doDelete(); 
+							//			              step = 4; 
+						} 
+						else { 
+							if ((Math.round(Math.random())) < 0.45) { 
+								bookIndex = (int)((Math.random() * Start.numPaperBackTitles)); 
+								targetBookTitle = Start.paperBackTitles.toArray()[bookIndex].toString(); 
+							} 
+							else { 
+								bookIndex = (int)((Math.random() * Start.numEBookTitles)); 
+								targetBookTitle = Start.eBookTitles.toArray()[bookIndex].toString(); 
+							} 
+							System.out.println("\n==> ["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle+"\n"); 
+							step = 0; 
+						} 
+						//			            myAgent.doDelete(); 
 					}
 					step = 4;
 				}
