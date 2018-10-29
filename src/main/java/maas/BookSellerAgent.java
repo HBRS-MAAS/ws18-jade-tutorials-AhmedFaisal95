@@ -6,6 +6,7 @@ import jade.content.onto.basic.Action;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.FIPANames;
 import jade.domain.JADEAgentManagement.JADEManagementOntology;
 import jade.domain.JADEAgentManagement.ShutdownPlatform;
@@ -18,6 +19,12 @@ import java.util.*;
 public class BookSellerAgent extends Agent {
 	// The catalogue of books for sale (maps the title of a book to its price)
 	private Hashtable catalogue;
+	
+	private List<String> myPaperBackTitles= new Vector<String> (Start.paperBackTitles); 
+	private List<String> myEBookTitles= new Vector<String> (Start.eBookTitles); 
+	   
+	private int numMyPaperBackTitles = myPaperBackTitles.size(); 
+	private int numMyEBookTitles = myEBookTitles.size();
 
 	protected void setup() {
 		System.out.println("Hello! Seller-agent "+getAID().getName()+" is ready.");
@@ -25,26 +32,24 @@ public class BookSellerAgent extends Agent {
 		// Create the catalogue
 		catalogue = new Hashtable<String, Double>();
 
-		int numPaperBackTitles = Start.paperBackTitles.size();
-		int numEBookTitles = Start.eBookTitles.size();
+		numMyPaperBackTitles = Start.paperBackTitles.size();
+		numMyEBookTitles = Start.eBookTitles.size();
 		int bookIndex = 0;
 
 		for (int i = 1 ; i <= 4 ; i++) {
-			if ((Math.round(Math.random())) < 0.45) {
-				bookIndex = (int)((Math.random() * numPaperBackTitles));
-				catalogue.put(Start.paperBackTitles.toArray()[bookIndex], (int) (Math.random()*20));
-			}
-			else {
-				bookIndex = (int)((Math.random() * numEBookTitles));
-				catalogue.put(Start.eBookTitles.toArray()[bookIndex], (int) (Math.random()*20));
-			}
+			restock();
 		}
 
-		System.out.println("["+getAID().getLocalName()+"]: Available Titles: ");
+		StringBuilder sb = new StringBuilder(); 
+		
+		sb.append("\n-----------------------\n");
+		sb.append("["+getAID().getLocalName()+"]: Available Titles: \n");
 		for (Object s : catalogue.keySet()) {
-			System.out.println("Book Title: "+(String)s+". Price: "+catalogue.get(s));
+			sb.append("Book Title: "+(String)s+". Price: "+catalogue.get(s)+"\n"); 
 		}
-		System.out.println("-----------------------");
+		sb.append("-----------------------\n"); 
+		
+		System.out.println(sb.toString());
 
 		try {
 			Thread.sleep(3000);
@@ -102,6 +107,12 @@ public class BookSellerAgent extends Agent {
 				myAgent.send(reply);
 			}
 			else {
+				myAgent.addBehaviour(new WakerBehaviour(myAgent, 60000) {
+					protected void handleElapsedTimeout() {
+						System.out.println("["+getAID().getLocalName()+"]: No more purchase requests. Closing down.");
+						addBehaviour(new shutdown());
+					}
+				} );
 				block();
 			}
 		}
@@ -119,15 +130,18 @@ public class BookSellerAgent extends Agent {
 				
 				if (title.contains("eBook")) {
 					price = (Integer) catalogue.get(title);
+					numMyEBookTitles--;
 				}
 				else {
 					price = (Integer) catalogue.remove(title);
+					numMyPaperBackTitles--; 
 					System.out.println("["+getAID().getLocalName()+"]: "+title+" (paperback) removed from catalogue.");
 				}
 				
 				if (price != null) {
 					reply.setPerformative(ACLMessage.INFORM);
-					System.out.println("["+getAID().getLocalName()+"]: "+title+" sold to agent "+msg.getSender().getName());
+					System.out.println("["+getAID().getLocalName()+"]: "+title+" sold to agent "+msg.getSender().getLocalName()); 
+			          restock(); 
 				}
 				else {
 					// The requested book has been sold to another buyer in the meanwhile .
@@ -140,6 +154,24 @@ public class BookSellerAgent extends Agent {
 				block();
 			}
 		}
-	}  
+	}
+	
+	 public void restock () { 
+		    int bookIndex = 0;
+		    String newBook = new String(); 
+		     
+		    if ((Math.round(Math.random())) < 0.45) { 
+		      bookIndex = (int)((Math.random() * numMyPaperBackTitles)); 
+		      newBook = myPaperBackTitles.toArray()[bookIndex].toString(); 
+		      catalogue.put(newBook, (int) (Math.random()*20)); 
+		    } 
+		    else { 
+		      bookIndex = (int)((Math.random() * numMyEBookTitles)); 
+		      newBook = myEBookTitles.toArray()[bookIndex].toString(); 
+		      catalogue.put(newBook, (int) (Math.random()*20)); 
+		    } 
+		     
+		    System.out.println("\n+++ ["+getAID().getLocalName()+"]: "+newBook+" now in stock.\n"); 
+		  } 
 
 }

@@ -10,6 +10,9 @@ public class Start {
 	public static List<String> paperBackTitles;
 	public static List<String> eBookTitles;
 	
+	public static int numPaperBackTitles = 0; 
+	public static int numEBookTitles = 0; 
+	
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
     	//agents.add("tester:maas.tutorials.BookBuyerAgent");
@@ -18,8 +21,8 @@ public class Start {
     	int numSellerAgents = 3;
     	paperBackTitles = createPaperBackTitles();
     	eBookTitles = createEBookTitles();
-    	int numPaperBackTitles = paperBackTitles.size();
-    	int numEBookTitles = eBookTitles.size();
+    	numPaperBackTitles = paperBackTitles.size();
+    	numEBookTitles = eBookTitles.size();
     	int bookIndex = 0;
     	
     	for (int i = 1 ; i <= numBuyerAgents ; i++) {
@@ -46,6 +49,8 @@ public class Start {
     	}
     	cmd.add(sb.toString());
         jade.Boot.main(cmd.toArray(new String[cmd.size()]));
+        
+        System.out.println("\n\n\n"); 
     }
     
     public static List<String> createPaperBackTitles () {
