@@ -118,15 +118,18 @@ public class BookSellerAgent extends Agent {
 				
 				if (title.contains("eBook")) {
 					price = (Integer) catalogue.get(title);
+					numMyEBookTitles--;
 				}
 				else {
 					price = (Integer) catalogue.remove(title);
+					numMyPaperBackTitles--; 
 					System.out.println("["+getAID().getLocalName()+"]: "+title+" (paperback) removed from catalogue.");
 				}
 				
 				if (price != null) {
 					reply.setPerformative(ACLMessage.INFORM);
-					System.out.println("["+getAID().getLocalName()+"]: "+title+" sold to agent "+msg.getSender().getName());
+					System.out.println("["+getAID().getLocalName()+"]: "+title+" sold to agent "+msg.getSender().getLocalName()); 
+			          restock(); 
 				}
 				else {
 					// The requested book has been sold to another buyer in the meanwhile .
