@@ -1,8 +1,10 @@
-[![Build Status](https://travis-ci.org/HBRS-MAAS/jade-tutorials.svg?branch=master)](https://travis-ci.org/HBRS-MAAS/jade-tutorials)
+[![Build Status](https://travis-ci.org/HBRS-MAAS/ws18-jade-tutorials-AhmedFaisal95.svg?branch=master)](https://travis-ci.org/HBRS-MAAS/ws18-jade-tutorials-AhmedFaisal95)
 
 # Jade Tutorials
 
 Make sure to keep this README updated, particularly on how to run your project from the **command line**.
+
+Update: In order to run this project from the command line, simply use the **gradle run** command. The book trading application simulation will run and terminate when it is over.
 
 
 ## Dependencies
