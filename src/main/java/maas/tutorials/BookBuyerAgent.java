@@ -22,15 +22,16 @@ public class BookBuyerAgent extends Agent {
 	private AID[] sellerAgents = {new AID("Seller1", AID.ISLOCALNAME), new AID("Seller2", AID.ISLOCALNAME), new AID("Seller3", AID.ISLOCALNAME)};
 
 	protected void setup() {
-		// Printout a welcome message
+		// Print a welcome message
 		System.out.println("Hello! Buyer-agent "+getAID().getName()+" is ready.");
 
+		// Get a title assigned as a start-up argument
 		Object[] args = getArguments();
 		if (args != null && args.length > 0) {
 			targetBookTitle = (String) args[0];
 			System.out.println("["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle);
 
-			// Add a TickerBehaviour that schedules a request to seller agents every minute
+			// Add a TickerBehaviour that regularly schedules a request to seller agents
 			addBehaviour(new TickerBehaviour(this, 1000) {
 				protected void onTick() {
 					myAgent.addBehaviour(new RequestPerformer());
@@ -41,13 +42,6 @@ public class BookBuyerAgent extends Agent {
 			System.out.println("No book title specified for agent ["+getAID().getLocalName()+"]");
 			doDelete();
 		}
-
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			//e.printStackTrace();
-		}
-//		addBehaviour(new shutdown());
 
 	}
 	protected void takeDown() {
@@ -76,52 +70,61 @@ public class BookBuyerAgent extends Agent {
 	}
 
 	private class RequestPerformer extends Behaviour {
-		private AID bestSeller; // The agent who provides the best offer
-		private int bestPrice; // The best offered price
-		private int repliesCnt = 0; // The counter of replies from seller agents
-		private MessageTemplate mt; // The template to receive replies
+		// Initialize variables to hold:
+		// * The agent who provides the best offer
+		// * The best offered price
+		// * The counter of replies from seller agents
+		// * The message template to receive replies
+		private AID bestSeller; 
+		private int bestPrice; 
+		private int repliesCnt = 0; 
+		private MessageTemplate mt; 
+		
 		private int step = 0;
 		private int bookIndex = 0; 
 
 		public void action() {
 			switch (step) {
 			case 0:
-				// Send the cfp to all sellers
+				// Send a CFP (request) message to all sellers
 				ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
 				for (int i = 0; i < sellerAgents.length; ++i) {
 					cfp.addReceiver(sellerAgents[i]);
 				}
 				cfp.setContent(targetBookTitle);
 				cfp.setConversationId("book-trade");
-				cfp.setReplyWith("cfp"+System.currentTimeMillis()); // Unique value
+				cfp.setReplyWith("cfp"+System.currentTimeMillis()); 
 				myAgent.send(cfp);
-				// Prepare the template to get proposals
+				
+				// Prepare a template to get proposals
 				mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"),
 						MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
 				step = 1;
 				break;
+				
 			case 1:
 				// Receive all proposals/refusals from seller agents
 				ACLMessage reply = myAgent.receive(mt);
 				if (reply != null) {
-					// Reply received
+					
 					if (reply.getPerformative() == ACLMessage.PROPOSE) {
-						// This is an offer
 						int price = Integer.parseInt(reply.getContent());
 						if (bestSeller == null || price < bestPrice) {
-							// This is the best offer at present
+							
 							bestPrice = price;
 							bestSeller = reply.getSender();
 						}
 					}
+					
 					repliesCnt++;
 					if (repliesCnt >= sellerAgents.length) {
-						// We received all replies
 						step = 2;
 					}
 				}
 				else {
-					myAgent.addBehaviour(new WakerBehaviour(myAgent, 60000) {
+					// Add a timeout behavior to terminate the agent if it receives no offers for 40 seconds.
+					// It is then assumed that no seller possesses the desired title.
+					myAgent.addBehaviour(new WakerBehaviour(myAgent, 40000) {
 						protected void handleElapsedTimeout() {
 							System.out.println("["+getAID().getLocalName()+"]: Book not available with any seller. Waited too long.");
 							myAgent.doDelete(); 
@@ -130,35 +133,39 @@ public class BookBuyerAgent extends Agent {
 					block();
 				}
 				break;
+				
 			case 2:
-				// Send the purchase order to the seller that provided the best offer
+				// Send a purchase order to the seller that provided the best offer
 				ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
 				order.addReceiver(bestSeller);
 				order.setContent(targetBookTitle);
 				order.setConversationId("book-trade");
 				order.setReplyWith("order"+System.currentTimeMillis());
 				myAgent.send(order);
-				// Prepare the template to get the purchase order reply
+				
+				// Prepare a template to get the purchase order reply
 				mt = MessageTemplate.and(MessageTemplate.MatchConversationId("book-trade"),
 						MessageTemplate.MatchInReplyTo(order.getReplyWith()));
 				step = 3;
 				break;
+				
 			case 3:
 				// Receive the purchase order reply
 				reply = myAgent.receive(mt);
 				if (reply != null) {
-					// Purchase order reply received
 					if (reply.getPerformative() == ACLMessage.INFORM) {
-						// Purchase successful. We can terminate
-						System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"+"["+getAID().getLocalName()+"]: "+targetBookTitle+" successfully purchased.\n"+"["+getAID().getLocalName()+"]: Price = "+bestPrice+"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"); 
-						 
+						// Purchase successful
+						System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"+"["+getAID().getLocalName()+"]: "+targetBookTitle+" successfully purchased.\n"+"["+getAID().getLocalName()+"]: Price = "+bestPrice+"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"); 
+						
+						// Increment the number of books bought by the agent
 						numBooksBought++; 
 
+						// If the agent has bought three books, it terminates.
 						if (numBooksBought == 3) {
 				            System.out.println("["+getAID().getLocalName()+"]: Three books purchased successfully!");
 							myAgent.doDelete(); 
-							//			              step = 4; 
 						} 
+						// If not, another random book title is assigned to it 
 						else { 
 							if ((Math.round(Math.random())) < 0.45) { 
 								bookIndex = (int)((Math.random() * Start.numPaperBackTitles)); 
@@ -171,7 +178,6 @@ public class BookBuyerAgent extends Agent {
 							System.out.println("\n==> ["+getAID().getLocalName()+"]: Trying to buy: "+targetBookTitle+"\n"); 
 							step = 0; 
 						} 
-						//			            myAgent.doDelete(); 
 					}
 					step = 4;
 				}
@@ -184,5 +190,5 @@ public class BookBuyerAgent extends Agent {
 		public boolean done() {
 			return ((step == 2 && bestSeller == null) || step == 4);
 		}
-	} // End of inner class RequestPerformer
+	} 
 }

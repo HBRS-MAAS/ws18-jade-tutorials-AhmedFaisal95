@@ -7,6 +7,7 @@ import maas.tutorials.BookBuyerAgent;
 import maas.BookSellerAgent;;
 
 public class Start {
+	// Add book lists as class variables
 	public static List<String> paperBackTitles;
 	public static List<String> eBookTitles;
 	
@@ -15,16 +16,18 @@ public class Start {
 	
     public static void main(String[] args) {
     	List<String> agents = new Vector<>();
-    	//agents.add("tester:maas.tutorials.BookBuyerAgent");
     	
+    	// Set number of agents, and initialize book title lists.
     	int numBuyerAgents = 20;
     	int numSellerAgents = 3;
+    	int bookIndex = 0;
+    	
     	paperBackTitles = createPaperBackTitles();
     	eBookTitles = createEBookTitles();
     	numPaperBackTitles = paperBackTitles.size();
     	numEBookTitles = eBookTitles.size();
-    	int bookIndex = 0;
     	
+    	// Initialize every buyer agent with a randomly assigned title
     	for (int i = 1 ; i <= numBuyerAgents ; i++) {
     		if ((Math.round(Math.random())) < 0.45) {
     			bookIndex = (int)((Math.random() * numPaperBackTitles));
@@ -36,6 +39,7 @@ public class Start {
     		}
     	}
     	
+    	// Initialize seller agents
     	for (int i = 1 ; i <= numSellerAgents ; i++) {
     		agents.add("Seller"+i+":maas.BookSellerAgent");
     	}
@@ -54,6 +58,9 @@ public class Start {
     }
     
     public static List<String> createPaperBackTitles () {
+    	/*
+    	 * Returns a list of paperback book titles (20 in total).
+    	 */
     	List<String> paperBackTitles = new Vector<String>();
 		
 		paperBackTitles.add("A Brief History of Time");
@@ -81,6 +88,9 @@ public class Start {
     }
     
     public static List<String> createEBookTitles () {
+    	/*
+    	 * Returns a list of ebook titles.
+    	 */
     	List<String> eBookTitles = new ArrayList<String>();
 		
 		eBookTitles.add("A Killer's Mind (eBook)");
